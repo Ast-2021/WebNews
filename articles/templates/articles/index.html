@@ -1,0 +1,17 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}Home page{% endblock %}
+
+{% block body %}
+    <ul class="list-group">
+        {% for article in articles %}
+        <li class="list-group-item">
+            <div class="list-group-item-image"><img src="{{ article.image.url }}" alt="image"></div>
+            <div class="list-group-item-description">
+                <h2>{{ article.title }}</h2>
+                <p>{{ article.text|truncatewords:20 }}</p>
+            </div>
+        </li>
+        {% endfor %}
+      </ul>
+{% endblock %}

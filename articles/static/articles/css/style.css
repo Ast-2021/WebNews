@@ -1,0 +1,96 @@
+section {
+    background-image: url('astronaut-space-laptop.jpg');
+    background-attachment: fixed;
+    background-size: auto;
+    min-height: 5000px;
+    max-height: 10000px;
+
+    display: flex;
+    justify-content: center;
+}
+
+footer {
+    background-color: black;
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.content {
+    width: 60%;
+    height: 100vh;
+}
+
+.block-content {
+    overflow: hidden;
+}
+
+.content>ul {
+    padding: 32px;
+}
+
+.list-group {
+    height: 100%;
+}
+
+.list-group-item-image {
+
+    margin: 15px;
+}
+
+.list-group-item-image>img {
+    height: 170px;
+    width: auto;
+
+}
+
+.list-group-item {
+    display: flex;
+}
+
+.list-group-item-description {
+    margin: 15px;
+    overflow: hidden;
+    margin-bottom: 0px;
+}
+
+@media (max-width: 1330px) {
+
+    .content {
+        width: 100%;
+    }
+}
+
+@media (max-width: 650px) {
+    .content {
+        width: 100%;
+    }
+
+    .list-group-item {
+        display: block;
+    }
+}
+
+@media (max-width: 370px) {
+    .list-group-item-image>img {
+        width: 200px;
+        height: auto;
+    }
+}
+
+.article-page>.list-group {
+    padding: 32px;
+}
+
+.article-page>.list-group>.list-group-item {
+    display: block;
+}
+
+.article-page>.list-group>.list-group-item>img {
+    width: 100%;
+}

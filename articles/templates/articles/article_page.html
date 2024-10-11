@@ -1,0 +1,20 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}
+{{ article.title }}
+{% endblock %}
+
+{% block body %}
+<div class="article-page">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <h1>{{ article.title }}</h1>
+                {% if article.image %}
+                <img src="{{ article.image.url }}" alt="image">
+                {% endif %}
+                <p>{{ article.text|linebreaks }}</p>
+            </li>
+          </ul>
+</div>
+{% endblock %}
+
