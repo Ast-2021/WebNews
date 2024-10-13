@@ -9,10 +9,17 @@
         <ul class="list-group">
             <li class="list-group-item">
                 <h1>{{ article.title }}</h1>
+                <p>Автор - {{ article.author }}</p>
                 {% if article.image %}
                 <img src="{{ article.image.url }}" alt="image">
                 {% endif %}
                 <p>{{ article.text|linebreaks }}</p>
+                <p>{{ article.date }}</p>
+                <p>Рейтинг статьи: {{ article.rating }}</p>
+                {% if request.user == article.author %}
+                <a href="{% url 'delete' article.pk %}">Delete</a>
+                <a href="{% url 'edit' article.pk %}">Edit</a>
+                {% endif %}
             </li>
           </ul>
 </div>

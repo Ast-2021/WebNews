@@ -4,14 +4,14 @@ from django.urls import reverse
 
 
 class Articles(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=250)
     text = models.TextField(blank=False)
     category = models.ForeignKey('Categories', on_delete=models.CASCADE)
-    tags = models.ManyToManyField('Tags')
+    tags = models.ManyToManyField('Tags', blank=True)
     image = models.ImageField(upload_to='articles/%Y%m%d/', blank=True)
     date = models.DateField(auto_now_add=True)
-    rating = models.IntegerField(default=0)
+    rating = models.IntegerField(default=0, blank=True)
 
     def __str__(self):
         return self.title

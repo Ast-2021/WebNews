@@ -18,6 +18,7 @@ ul {
 }
 
 a {
+    color: black;
     text-decoration: none;
 }
 
@@ -93,4 +94,49 @@ a {
 
 .article-page>.list-group>.list-group-item>img {
     width: 100%;
+}
+
+.box-form>form>.mb-3 {
+    display: flex;
+    justify-content: center;
+}
+
+.mb-3>.form-label {
+    color: white;
+    font-size: 20px;
+}
+
+.mb-3>.box-box-form>.form-label {
+    color: white;
+    font-size: 20px;
+}
+
+.box-for-button {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.box-form {
+    display: flex;
+    justify-content: center;
+}
+
+.block-for-title-for-forms {
+    display: flex;
+    justify-content: center;
+}
+
+.title-for-forms {
+    color: white;
+    margin: 50px;
+}
+
+.ttt {
+    display: table-cell;
+    vertical-align: inherit;
+}
+
+header>nav>.container-fluid>.navbar-collapse {
+    justify-content: space-between;
 }

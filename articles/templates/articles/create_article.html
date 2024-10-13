@@ -1,0 +1,37 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}
+Создание статьи
+{% endblock %}
+
+{% block body %}
+
+<div class="box-form">
+
+    <form method="post" enctype="multipart/form-data">
+        <div class="block-for-title-for-forms">
+            <h1 class="title-for-forms">Создание статьи</h1>
+        </div>
+        {% csrf_token %}
+            <div class="mb-3">
+                <label for="{{form.title.id_for_label}}" class="form-label">Название</label>
+               <div class="ttt">{{form.title}}</div>
+            </div>
+            <div class="mb-3">
+                <label for="{{form.text.id_for_label}}" class="form-label">Текст</label>
+                <div class="ttt">{{form.text}}</div>
+            </div>
+            <div class="mb-3">
+                <label for="{{form.category.id_for_label}}" class="form-label">Категории</label>
+                <div class="ttt">{{form.category}}</div> 
+            </div>
+            <div class="mb-3">
+                <label for="{{form.tags.id_for_label}}" class="form-label">Теги</label>
+                <div class="ttt">{{form.tags}}</div>
+            </div>
+        <br>
+        <button type="submit" class="btn btn-light">Light</button>
+    </form>
+</div>
+
+{% endblock %}
