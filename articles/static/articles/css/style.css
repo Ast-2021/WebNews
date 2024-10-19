@@ -86,6 +86,7 @@ a {
 
 .article-page>.list-group {
     padding: 32px;
+    padding-bottom: 0px;
 }
 
 .article-page>.list-group>.list-group-item {
@@ -96,10 +97,6 @@ a {
     width: 100%;
 }
 
-.box-form>form>.mb-3 {
-    display: flex;
-    justify-content: center;
-}
 
 .mb-3>.form-label {
     color: white;
@@ -139,4 +136,91 @@ a {
 
 header>nav>.container-fluid>.navbar-collapse {
     justify-content: space-between;
+}
+
+.block-for-comments>h3 {
+    color: white;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.rating {
+    display: flex;
+}
+
+.num-of-rating {
+    padding: 5px;
+}
+
+.block-for-comments {
+    padding: 32px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.rating>a>.btn-warning {
+    height: 32px;
+    width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rating>a>.btn-success {
+    height: 32px;
+    width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rating>a>.btn-danger {
+    height: 32px;
+    width: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.num-of-rating {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.comments-in-user-page>.list-group>.list-group-item {
+    display: block;
+}
+
+.title-comments {
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.title-articles {
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.user-page-block-for-image-and-title {
+    display: flex;
+}
+
+.block-for-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60%;
+}
+
+.block-for-image {
+    width: 40%;
+}
+
+.block-for-image>img {
+    width: 100%;
+    height: auto;
+}
+
+.user-page-title {
+    font-size: 60px;
 }

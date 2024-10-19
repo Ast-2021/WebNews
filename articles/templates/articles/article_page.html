@@ -15,13 +15,89 @@
                 {% endif %}
                 <p>{{ article.text|linebreaks }}</p>
                 <p>{{ article.date }}</p>
-                <p>Рейтинг статьи: {{ article.rating }}</p>
+                <div class="rating">
+                    {% if request.user.is_authenticated %}
+                    <a href="{% url 'positive_rating_of_the_article' article.pk %}">
+                        {% if user_article_rating == 1 %}
+                        <button type="button" class="btn btn-warning">+</button>
+                        {% else %}
+                        <button type="button" class="btn btn-success">+</button>
+                        {% endif %}
+                    </a>
+                    <p class="num-of-rating">{{ article_rating }}</p>
+                    <a href="{% url 'negative_rating_of_article' article.pk %}">
+                        {% if user_article_rating == -1 %}
+                        <button type="button" class="btn btn-warning">-</button>
+                        {% else %}
+                        <button type="button" class="btn btn-danger">-</button>
+                        {% endif %}
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}">
+                        <button type="button" class="btn btn-success">+</button>
+                    </a>
+                    <p class="num-of-rating">{{ article_rating }}</p>
+                    <a href="{% url 'login' %}">
+                        <button type="button" class="btn btn-danger">-</button>
+                    </a>
+                    {% endif %}
+                </div>
                 {% if request.user == article.author %}
                 <a href="{% url 'delete' article.pk %}">Delete</a>
                 <a href="{% url 'edit' article.pk %}">Edit</a>
                 {% endif %}
             </li>
           </ul>
+
+          <div class="block-for-comments">
+              <h3>Коментарии</h3>
+              <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <p>
+                            <label for="id_text"></label>
+                            <textarea name="text" cols="40" rows="10" required id="id_text" style="height: 30px;"></textarea>
+                        </p>
+                    </div>
+                    <button type="submit" class="btn btn-primary">ОТПРАВИТЬ</button>
+              </form>
+          </div>
+
+          <ul class="list-group">
+              {% for comment in comments %}
+                <li class="list-group-item">
+                    <h3>{{ comment.body_comment.author }}</h3>
+                    <p>{{ comment.body_comment.date }}</p>
+                    <p>{{ comment.body_comment.text }}</p>
+                    <div class="rating">
+                        {% if request.user.is_authenticated %}
+                        <a href="{% url 'positive_rating_of_the_comment' comment.body_comment.pk %}">
+                            {% if user_comment_rating == 1 %}
+                            <button type="button" class="btn btn-warning">+</button>
+                            {% else %}
+                            <button type="button" class="btn btn-success">+</button>
+                            {% endif %}
+                        </a>
+                        <p class="num-of-rating">{{ comment.comment_rating }}</p>
+                        <a href="{% url 'negative_rating_of_comment' comment.body_comment.pk %}">
+                            {% if user_comment_rating == -1 %}
+                            <button type="button" class="btn btn-warning">-</button>
+                            {% else %}
+                            <button type="button" class="btn btn-danger">-</button>
+                            {% endif %}
+                        </a>
+                        {% else %}
+                        <a href="{% url 'login' %}">
+                            <button type="button" class="btn btn-success">+</button>
+                        </a>
+                        <p class="num-of-rating">{{ comment.comment_rating }}</p>
+                        <a href="{% url 'login' %}">
+                            <button type="button" class="btn btn-danger">-</button>
+                        </a>
+                        {% endif %}
+                    </div>
+                </li>
+              {% endfor %}
+          </ul>
 </div>
 {% endblock %}
-

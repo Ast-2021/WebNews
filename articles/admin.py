@@ -6,4 +6,5 @@ admin.site.register(Articles)
 admin.site.register(Comments)
 admin.site.register(Categories)
 admin.site.register(Tags)
+admin.site.register(CommentRating)
 
