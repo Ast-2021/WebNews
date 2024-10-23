@@ -24,6 +24,10 @@ class LoginUserForm(AuthenticationForm):
     username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
 
+    class Meta:
+        model = User
+        fields = ('username', 'password')
+
 
 class CommentForm(forms.ModelForm):
     class Meta:

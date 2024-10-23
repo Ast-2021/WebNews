@@ -1,7 +1,8 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from .models import Articles, Categories, Comments, User, CommentRating, ArticleRating
+from .models import *
+from .forms import *
 
 
 class TestViews(TestCase):
@@ -154,3 +155,43 @@ class TestViews(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(ArticleRating.objects.first().grade, -1)
+
+
+class TestForms(TestCase):
+    """Тестирование форм модуля forms.py"""
+
+    def setUp(self):
+        self.category = Categories.objects.create(title='test')
+        self.user = User.objects.create(username='Zion', password='rekmcfhby')
+        self.article = Articles.objects.create(title='test_article', text='test_text', category=self.category)
+
+
+    def test_article_form(self):
+        form_data = {
+            'title': 'Test_title',
+            'text': 'Test_text',
+            'category': self.category
+        }
+
+        form = ArticleForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    
+    def test_register_user_form(self):
+        form_data = {
+            'username': 'test_username',
+            'password1': 'testpassword1',
+            'password2': 'testpassword1'
+        }
+
+        form = RegisterUserForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+
+    def test_comment_form(self):
+        form_data = {
+            'text': 'textextext'
+        }
+
+        form = CommentForm(data=form_data)
+        self.assertTrue(form.is_valid())
