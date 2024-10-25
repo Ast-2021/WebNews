@@ -1,70 +1,62 @@
-from functools import reduce
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from .models import *
 from django.views.generic.edit import CreateView, UpdateView
-from .forms import *
-from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView, CreateView
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 
-
-def index(request):
-    categories = Categories.objects.all()
-    articles = Articles.objects.all()
-    context = {'categories': categories, 'articles': articles}
-    return render(request, 'articles/index.html', context=context)
+from .utils import *
+from .forms import *
+from .models import *
 
 
-def category_view(request, cat_pk):
-    category = Categories.objects.get(pk=cat_pk)
-    categories = Categories.objects.all()
-    articles = Articles.objects.filter(category=category)
-    context = {'categories': categories, 'articles': articles}
-    return render(request, 'articles/index.html', context=context)
+class ArticlesHome(ListView):
+    model = Articles
+    template_name = 'articles/index.html'
+    context_object_name = 'articles'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Categories.objects.all()
+        return context
+
+
+class CategoryView(ListView):
+    model = Articles
+    template_name = 'articles/index.html'
+    context_object_name = 'articles'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Categories.objects.all()
+        return context
     
+    def get_queryset(self):
+        return Articles.objects.filter(category__pk=self.kwargs['cat_pk'])
+
 
 def article_page(request, art_pk):
     article = Articles.objects.get(pk=art_pk)
-    comments = Comments.objects.filter(article__pk=art_pk)
     article_rating = ArticleRating.objects.count()
-    complete_comment = []
-    for comment in comments:
-        comment_rating = CommentRating.objects.filter(comment=comment).count()
-        complete_comment.append({'body': comment, 'rating': comment_rating})
-
     categories = Categories.objects.all()
 
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            new_form = form.save()
-            new_form.author = request.user
-            new_form.article = article
-            new_form.save()
-            return redirect('article', art_pk)
-    else:
-        form = CommentForm()
-
+    form = get_form_for_create_comments(request, article, art_pk)
+    comments = get_comments(art_pk)
     context = {'categories': categories, 'article': article, 'form': form, 
-               'article_rating': article_rating, 'comments': complete_comment}
+               'article_rating': article_rating, 'comments': comments}
     return render(request, 'articles/article_page.html', context=context)
 
 
-@login_required(login_url='login')
-def create_article(request):
-    if request.method == 'POST':
-        form = ArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            newform = form.save()
-            newform.author = request.user
-            newform.save()
-            return redirect('home')
-    else:
-        form = ArticleForm()
-    context = {'form': form}
-    return render(request, 'articles/create_article.html', context=context)
-        
+class CreateArticle(CreateView):
+    form_class = ArticleForm
+    template_name = 'articles/create_article.html'
+    success_url = reverse_lazy('home')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Categories.objects.all()
+        return context
+
 
 class ArticleUpdateView(UpdateView):
     model = Articles
@@ -95,6 +87,12 @@ def logout_user(request):
 def delete_article(request, art_pk):
     Articles.objects.get(pk=art_pk).delete()
     return redirect('home')
+
+
+def delete_comment(request, com_pk):
+    article_pk = Comments.objects.get(pk=com_pk).article.pk
+    Comments.objects.get(pk=com_pk).delete()
+    return redirect('article', article_pk)
 
 
 def user_page(request):
