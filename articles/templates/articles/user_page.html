@@ -22,8 +22,7 @@
                 <h3 class="title-articles">Опубликованные статьи: </h3>
                 {% if articles %}
                 <ul class="list-group">
-                    {% for article in articles %}
-                    
+                    {% for article in articles %} 
                     <li class="list-group-item">
                         <a href="{{ article.get_absolute_url }}">
                             {% if article.image %}
@@ -49,25 +48,6 @@
                               <h3>{{ comment.author }}</h3>
                               <p>{{ comment.date }}</p>
                               <p>{{ comment.text }}</p>
-                              <div class="rating">
-                                  {% if request.user.is_authenticated %}
-                                  <a href="{% url 'positive_rating_of_the_comment' comment.pk %}">
-                                      <button type="button" class="btn btn-success">+</button>
-                                  </a>
-                                  <p class="num-of-rating">{{ comment.rating }}</p>
-                                  <a href="{% url 'negative_rating_of_comment' comment.pk %}">
-                                      <button type="button" class="btn btn-danger">-</button>
-                                  </a>
-                                  {% else %}
-                                  <a href="{% url 'login' %}">
-                                      <button type="button" class="btn btn-success">+</button>
-                                  </a>
-                                  <p class="num-of-rating">{{ comment.rating }}</p>
-                                  <a href="{% url 'login' %}">
-                                      <button type="button" class="btn btn-danger">-</button>
-                                  </a>
-                                  {% endif %}
-                              </div>
                           </li>
                         {% endfor %}
                     </ul>

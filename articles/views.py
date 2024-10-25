@@ -9,17 +9,6 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 
 
-def sum_of_all_elements_of_the_iterable_object(iter_obj):
-    if len(iter_obj) == 0:
-        return 0
-    elif len(iter_obj) == 1:
-        return iter_obj[0]
-    elif len(iter_obj) > 2:
-        return iter_obj[0].grade + sum_of_all_elements_of_the_iterable_object(iter_obj[1:])
-    else:
-        return iter_obj[0].grade + iter_obj[1].grade
-
-
 def index(request):
     categories = Categories.objects.all()
     articles = Articles.objects.all()
@@ -38,23 +27,13 @@ def category_view(request, cat_pk):
 def article_page(request, art_pk):
     article = Articles.objects.get(pk=art_pk)
     comments = Comments.objects.filter(article__pk=art_pk)
-    categories = Categories.objects.all()
-    try:
-        user_article_rating = ArticleRating.objects.get(user=request.user).grade
-        user_comment_rating = CommentRating.objects.get(user=request.user).grade
-    except:
-        user_article_rating = 0
-        user_comment_rating = 0
-
-    article_rating = sum_of_all_elements_of_the_iterable_object(ArticleRating.objects.filter(article=article))
-
-    full_comments = []
+    article_rating = ArticleRating.objects.count()
+    complete_comment = []
     for comment in comments:
-        try:
-            comment_rating = sum_of_all_elements_of_the_iterable_object(CommentRating.objects.filter(comment=comment))
-        except:
-            comment_rating = 99
-        full_comments.append({'body_comment': comment, 'comment_rating': comment_rating})
+        comment_rating = CommentRating.objects.filter(comment=comment).count()
+        complete_comment.append({'body': comment, 'rating': comment_rating})
+
+    categories = Categories.objects.all()
 
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -67,8 +46,8 @@ def article_page(request, art_pk):
     else:
         form = CommentForm()
 
-    context = {'categories': categories, 'article': article, 'comments': full_comments, 'form': form, 
-               'user_comment_rating': user_comment_rating, 'user_article_rating': user_article_rating, 'article_rating': article_rating}
+    context = {'categories': categories, 'article': article, 'form': form, 
+               'article_rating': article_rating, 'comments': complete_comment}
     return render(request, 'articles/article_page.html', context=context)
 
 
@@ -126,60 +105,22 @@ def user_page(request):
     return render(request, 'articles/user_page.html', context=context)
 
 
-def positive_rating_of_the_comment(request, pk):
-    comment = Comments.objects.get(pk=pk)
-    try:
-        CommentRating.objects.create(grade=1, comment=comment, user=request.user)
-    except:
-        if CommentRating.objects.get(user=request.user, comment=comment).grade != 1:
-            com_rat = CommentRating.objects.get(user=request.user, comment=comment)
-            com_rat.grade = 1
-            com_rat.save()
-        else:
-            pass
-    return redirect('article', comment.article.pk)
-
-
-def negative_rating_of_comment(request, pk):
-    comment = Comments.objects.get(pk=pk)
-    try:
-        CommentRating.objects.create(grade=-1, comment=comment, user=request.user)
-    except:
-        if CommentRating.objects.get(user=request.user, comment=comment).grade != -1:
-            com_rat = CommentRating.objects.get(user=request.user, comment=comment)
-            com_rat.grade = -1
-            com_rat.save()
-        else:
-            pass
-
-    return redirect('article', comment.article.pk)
-
-
-def positive_rating_of_the_article(request, pk):
+def article_rating(request, pk):
     article = Articles.objects.get(pk=pk)
     try:
-        ArticleRating.objects.create(grade=1, article=article, user=request.user)
-    except:
-        if ArticleRating.objects.get(user=request.user, article=article).grade != 1:
-            art_rat = ArticleRating.objects.get(user=request.user, article=article)
-            art_rat.grade = 1
-            art_rat.save()
-        else:
-            pass
+        if ArticleRating.objects.get(user=request.user, article=article):
+            ArticleRating.objects.get(user=request.user, article=article).delete()
 
+    except:
+        ArticleRating.objects.create(user=request.user, article=article)
     return redirect('article', article.pk)
 
 
-def negative_rating_of_article(request, pk):
-    article = Articles.objects.get(pk=pk)
+def comment_rating(request, pk):
+    comment = Comments.objects.get(pk=pk)
     try:
-        ArticleRating.objects.create(grade=-1, article=article, user=request.user)
+        if CommentRating.objects.get(user=request.user, comment=comment):
+            CommentRating.objects.get(user=request.user, comment=comment).delete()
     except:
-        if ArticleRating.objects.get(user=request.user, article=article).grade != -1:
-            art_rat = ArticleRating.objects.get(user=request.user, article=article)
-            art_rat.grade = -1
-            art_rat.save()
-        else:
-            pass
-
-    return redirect('article', article.pk)
+        CommentRating.objects.create(user=request.user, comment=comment)
+    return redirect('article', comment.article.pk)

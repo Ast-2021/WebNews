@@ -13,8 +13,6 @@ urlpatterns = [
     path('edit/<int:pk>', views.ArticleUpdateView.as_view(), name='edit'),
     path('delete/<int:art_pk>', views.delete_article, name='delete'),
     path('user_page', views.user_page, name='user_page'),
-    path('positive_rating_of_the_comment/<int:pk>', views.positive_rating_of_the_comment, name='positive_rating_of_the_comment'),
-    path('negative_rating_of_comment/<int:pk>', views.negative_rating_of_comment, name='negative_rating_of_comment'),
-    path('positive_rating_of_the_article/<int:pk>', views.positive_rating_of_the_article, name='positive_rating_of_the_article'),
-    path('negative_rating_of_article/<int:pk>', views.negative_rating_of_article, name='negative_rating_of_article' )
+    path('article_rating/<int:pk>', views.article_rating, name='article_rating'),
+    path('comment_rating/<int:pk>', views.comment_rating, name='comment_rating'),
 ]

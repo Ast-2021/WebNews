@@ -49,18 +49,16 @@ class Tags(models.Model):
     
 
 class ArticleRating(models.Model):
-    grade = models.IntegerField(default=0, validators=[MaxLengthValidator(1), MinLengthValidator(-1)])
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Articles, on_delete=models.CASCADE)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.grade)
-      
+        return self.user.username
+    
 
 class CommentRating(models.Model):
-    grade = models.IntegerField(default=0, validators=[MaxLengthValidator(1), MinLengthValidator(-1)])
-    comment = models.ForeignKey('Comments', on_delete=models.CASCADE)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comments, on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.grade)
+        return self.user.username

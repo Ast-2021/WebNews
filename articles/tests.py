@@ -27,10 +27,8 @@ class TestViews(TestCase):
         self.url_login_user = reverse('login')
         self.url_delete_article = reverse('delete', args=[self.article_1.pk])
         self.url_user_page = reverse('user_page')
-        self.url_positive_rating_of_the_comment = reverse('positive_rating_of_the_comment', args=[self.comment.pk])
-        self.url_negative_rating_of_comment = reverse('negative_rating_of_comment', args=[self.comment.pk])
-        self.url_positive_rating_of_the_article = reverse('positive_rating_of_the_article', args=[self.article_1.pk])
-        self.url_negative_rating_of_article = reverse('negative_rating_of_article', args=[self.article_1.pk])
+        self.url_article_rating = reverse('article_rating', args=[self.article_1.pk])
+        self.url_comment_rating = reverse('comment_rating', args=[self.comment.pk])
 
 
     def test_index(self):
@@ -129,32 +127,18 @@ class TestViews(TestCase):
         self.assertIn('username', response.content.decode('utf-8'))
 
 
-    def test_positive_rating_of_the_comment(self):
-        response = self.client.get(self.url_positive_rating_of_the_comment)
+    def test_article_rating(self):
+        response = self.client.get(self.url_article_rating)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(CommentRating.objects.first().grade, 1)
-
-
-    def test_negative_rating_of_comment(self):
-        response = self.client.get(self.url_negative_rating_of_comment)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(CommentRating.objects.first().grade, -1)
+        self.assertEqual(ArticleRating.objects.count(), 1)
 
     
-    def test_positive_rating_of_the_article(self):
-        response = self.client.get(self.url_positive_rating_of_the_article)
-
+    def test_comment_rating(self):
+        response = self.client.get(self.url_comment_rating)
+        
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(ArticleRating.objects.first().grade, 1)
-
-    
-    def test_negative_rating_of_article(self):
-        response = self.client.get(self.url_negative_rating_of_article)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(ArticleRating.objects.first().grade, -1)
+        self.assertEqual(CommentRating.objects.count(), 1)
 
 
 class TestForms(TestCase):
