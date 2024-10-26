@@ -37,7 +37,7 @@ class CategoryView(ListView):
 
 def article_page(request, art_pk):
     article = Articles.objects.get(pk=art_pk)
-    article_rating = ArticleRating.objects.count()
+    article_rating = ArticleRating.objects.filter(article=article).count()
     article_valuers = [a.user for a in ArticleRating.objects.filter(article=article)]
     categories = Categories.objects.all()
 
@@ -110,7 +110,6 @@ def article_rating(request, pk):
     try:
         if ArticleRating.objects.get(user=request.user, article=article):
             ArticleRating.objects.get(user=request.user, article=article).delete()
-
     except:
         ArticleRating.objects.create(user=request.user, article=article)
     return redirect('article', article.pk)
