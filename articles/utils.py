@@ -9,7 +9,9 @@ def get_comments(art_pk):
     complete_comment = []
     for comment in comments:
         comment_rating = CommentRating.objects.filter(comment=comment).count()
-        complete_comment.append({'body': comment, 'rating': comment_rating})
+        users_valuers = [c.user for c in CommentRating.objects.filter(comment=comment)]
+        complete_comment.append({'body': comment, 'rating': comment_rating,
+                                 'users_valuers': users_valuers})
     return complete_comment
 
 

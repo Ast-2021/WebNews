@@ -38,12 +38,14 @@ class CategoryView(ListView):
 def article_page(request, art_pk):
     article = Articles.objects.get(pk=art_pk)
     article_rating = ArticleRating.objects.count()
+    article_valuers = [a.user for a in ArticleRating.objects.filter(article=article)]
     categories = Categories.objects.all()
 
     form = get_form_for_create_comments(request, article, art_pk)
     comments = get_comments(art_pk)
     context = {'categories': categories, 'article': article, 'form': form, 
-               'article_rating': article_rating, 'comments': comments}
+               'article_rating': article_rating, 'comments': comments, 
+               'article_valuers': article_valuers}
     return render(request, 'articles/article_page.html', context=context)
 
 
