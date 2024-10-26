@@ -58,6 +58,10 @@ class CreateArticle(CreateView):
         context = super().get_context_data(**kwargs)
         context['categories'] = Categories.objects.all()
         return context
+    
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 
 class ArticleUpdateView(UpdateView):

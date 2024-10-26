@@ -224,3 +224,11 @@ header>nav>.container-fluid>.navbar-collapse {
 .user-page-title {
     font-size: 60px;
 }
+
+.article-rating {
+    padding: 3px;
+}
+
+.comment-rating {
+    padding: 3px;
+}
