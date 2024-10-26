@@ -22,8 +22,8 @@
                 <a class="article-rating" href="{% url 'article_rating' article.pk %}"><i class="fa-regular fa-heart"></i></a> {{ article_rating }}
                 {% endif %}
                 {% if request.user == article.author %}
-                <a href="{% url 'delete_article' article.pk %}">Delete</a>
-                <a href="{% url 'edit' article.pk %}">Edit</a>
+                <a class="article-button-delete" href="{% url 'delete_article' article.pk %}"><button type="button" class="btn btn-danger">Delete</button></a>
+                <a class="article-button-edit" href="{% url 'edit' article.pk %}"><button type="button" class="btn btn-warning">Edit</button></a>
                 {% endif %}
             </li>
           </ul>
@@ -54,7 +54,7 @@
                     <a class="comment-rating" href="{% url 'comment_rating' comment.body.pk %}"><i class="fa-regular fa-heart"></i></a> {{ comment.rating }}
                     {% endif %}
                     {% if request.user == comment.body.author %}
-                    <a href="{% url 'delete_comment' comment.body.pk %}">Delete</a>
+                    <a class="comment-button-delete" href="{% url 'delete_comment' comment.body.pk %}"><button type="button" class="btn btn-danger">Delete</button></a>
                     {% endif %}
                 </li>
               {% endfor %}

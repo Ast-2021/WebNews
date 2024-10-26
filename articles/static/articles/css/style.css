@@ -232,3 +232,15 @@ header>nav>.container-fluid>.navbar-collapse {
 .comment-rating {
     padding: 3px;
 }
+
+.article-button-delete {
+    padding-left: 15px;
+}
+
+.article-button-edit {
+    padding-left: 15px;
+}
+
+.comment-button-delete {
+    padding-left: 15px;
+}
