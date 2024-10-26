@@ -4,6 +4,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import ListView, CreateView
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 
 from .utils import *
 from .forms import *
@@ -49,6 +50,7 @@ def article_page(request, art_pk):
     return render(request, 'articles/article_page.html', context=context)
 
 
+@superuser_required()
 class CreateArticle(CreateView):
     form_class = ArticleForm
     template_name = 'articles/create_article.html'
@@ -109,6 +111,7 @@ def user_page(request):
     return render(request, 'articles/user_page.html', context=context)
 
 
+@login_required(login_url='login')
 def article_rating(request, pk):
     article = Articles.objects.get(pk=pk)
     try:
@@ -119,6 +122,7 @@ def article_rating(request, pk):
     return redirect('article', article.pk)
 
 
+@login_required(login_url='login')
 def comment_rating(request, pk):
     comment = Comments.objects.get(pk=pk)
     try:
