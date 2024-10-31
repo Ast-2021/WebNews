@@ -50,7 +50,6 @@ def article_page(request, art_pk):
     return render(request, 'articles/article_page.html', context=context)
 
 
-@superuser_required()
 class CreateArticle(CreateView):
     form_class = ArticleForm
     template_name = 'articles/create_article.html'

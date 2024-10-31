@@ -9,8 +9,8 @@
         <ul class="list-group">
             <li class="list-group-item">
                 <h1>{{ article.title }}</h1>
-                <p>Категория - {{ article.category }}</p>
-                <p>Автор - {{ article.author }}</p>
+                <h5>Категория - {{ article.category }}</h5>
+                <h5>Автор - {{ article.author }}</h5>
                 {% if article.image %}
                 <img src="{{ article.image.url }}" alt="image">
                 {% endif %}
