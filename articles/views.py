@@ -67,7 +67,7 @@ class CreateArticle(CreateView):
 
 class ArticleUpdateView(UpdateView):
     model = Articles
-    fields = ['title', 'text', 'category', 'tags']
+    fields = ['title', 'text', 'image', 'category', 'tags']
     template_name = 'articles/create_article.html'
     success_url = reverse_lazy('home')
 
