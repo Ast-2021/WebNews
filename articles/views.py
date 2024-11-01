@@ -5,6 +5,7 @@ from django.views.generic import ListView, CreateView
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .utils import *
 from .forms import *
@@ -50,7 +51,8 @@ def article_page(request, art_pk):
     return render(request, 'articles/article_page.html', context=context)
 
 
-class CreateArticle(CreateView):
+class CreateArticle(LoginRequiredMixin, CreateView):
+    login_url = 'login'
     form_class = ArticleForm
     template_name = 'articles/create_article.html'
     success_url = reverse_lazy('home')
@@ -110,7 +112,7 @@ def user_page(request):
     return render(request, 'articles/user_page.html', context=context)
 
 
-@login_required(login_url='login')
+@login_required(redirect_field_name='login')
 def article_rating(request, pk):
     article = Articles.objects.get(pk=pk)
     try:
@@ -121,7 +123,7 @@ def article_rating(request, pk):
     return redirect('article', article.pk)
 
 
-@login_required(login_url='login')
+@login_required(redirect_field_name='login')
 def comment_rating(request, pk):
     comment = Comments.objects.get(pk=pk)
     try:
