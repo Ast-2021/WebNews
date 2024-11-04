@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.core.validators import MaxLengthValidator, MinLengthValidator
 
 
 class Articles(models.Model):
@@ -13,6 +12,10 @@ class Articles(models.Model):
     image = models.ImageField(upload_to='articles/%Y%m%d/', blank=True)
     date = models.DateField(auto_now_add=True)
     rating = models.IntegerField(default=0, blank=True)
+
+    class Meta:
+        verbose_name = 'Статья'
+        verbose_name_plural = 'Статьи'
 
     def __str__(self):
         return self.title
@@ -27,12 +30,20 @@ class Comments(models.Model):
     text = models.TextField(blank=False)
     date = models.DateField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
     def __str__(self):
         return self.text
 
 
 class Categories(models.Model):
     title = models.CharField(max_length=250)
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.title
@@ -44,6 +55,10 @@ class Categories(models.Model):
 class Tags(models.Model):
     title = models.CharField(max_length=250)
 
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
     def __str__(self):
         return self.title
     
@@ -52,6 +67,10 @@ class ArticleRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Articles, on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name = 'Оценка статьи'
+        verbose_name_plural = 'Оценки статьи'
+
     def __str__(self):
         return self.user.username
     
@@ -59,6 +78,10 @@ class ArticleRating(models.Model):
 class CommentRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comments, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Оценка комментария'
+        verbose_name_plural = 'Оценки комментария'
 
     def __str__(self):
         return self.user.username
