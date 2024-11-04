@@ -28,6 +28,7 @@
                       Категории
                     </a>
                     <ul class="dropdown-menu">
+                            <li><a href="{% url 'home' %}" class="dropdown-item">Все категории</a></li>
                         {% for category in categories %}
                             <li><a class="dropdown-item" href="{{ category.get_absolute_url }}">{{category.title}}</a></li>
                         {% endfor %}
