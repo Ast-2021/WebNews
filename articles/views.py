@@ -53,6 +53,7 @@ def article_page(request, art_pk):
 
 class CreateArticle(LoginRequiredMixin, CreateView):
     login_url = 'login'
+    
     form_class = ArticleForm
     template_name = 'articles/create_article.html'
     success_url = reverse_lazy('home')
