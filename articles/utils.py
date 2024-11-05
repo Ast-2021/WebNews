@@ -2,10 +2,9 @@ from django.shortcuts import redirect
 from .models import *
 from .forms import *
 
-from django.contrib.auth.mixins import UserPassesTestMixin
-from django.views.generic import View
+import logging
 
-
+logger = logging.getLogger('main')
 
 def get_comments(art_pk):
     comments = Comments.objects.filter(article__pk=art_pk)
@@ -26,17 +25,8 @@ def get_form_for_create_comments(request, article, art_pk):
             new_form.author = request.user
             new_form.article = article
             new_form.save()
+            logger.info(f'User id({request.user.id}) posted a comment id({new_form.pk})')
             return redirect('article', art_pk)
     else:
         form = CommentForm()
     return form
-
-
-def superuser_required():
-    def wrapper(wrapped):
-        class WrappedClass(UserPassesTestMixin, wrapped):
-            def test_func(self):
-                return self.request.user.is_superuser
-
-        return WrappedClass
-    return wrapper

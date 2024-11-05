@@ -11,6 +11,11 @@ from .utils import *
 from .forms import *
 from .models import *
 
+import logging
+
+
+logger = logging.getLogger('main')
+
 
 class ArticlesHome(ListView):
     model = Articles
@@ -74,11 +79,17 @@ class ArticleUpdateView(UpdateView):
     template_name = 'articles/create_article.html'
     success_url = reverse_lazy('home')
 
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
+
 
 class RegisterUser(CreateView):
     form_class = RegisterUserForm
     template_name = 'articles/register.html'
     success_url = reverse_lazy('login')
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
 
 
 class LoginUser(LoginView):
@@ -87,6 +98,9 @@ class LoginUser(LoginView):
 
     def get_success_url(self):
         return reverse_lazy('home')
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
     
 
 def logout_user(request):
@@ -96,12 +110,16 @@ def logout_user(request):
 
 def delete_article(request, art_pk):
     Articles.objects.get(pk=art_pk).delete()
+
+    logger.info(f'User id({request.user.id}) deleted article id({art_pk})')
     return redirect('home')
 
 
 def delete_comment(request, com_pk):
     article_pk = Comments.objects.get(pk=com_pk).article.pk
     Comments.objects.get(pk=com_pk).delete()
+
+    logger.info(f'User id({request.user.id} deleted comment id({com_pk}))')
     return redirect('article', article_pk)
 
 
@@ -119,8 +137,12 @@ def article_rating(request, pk):
     try:
         if ArticleRating.objects.get(user=request.user, article=article):
             ArticleRating.objects.get(user=request.user, article=article).delete()
+
+            logger.info(f'User id({request.user.id}) removed the like from article id({article.pk})')
     except:
         ArticleRating.objects.create(user=request.user, article=article)
+
+        logger.info(f'User id({request.user.id}) liked article id({article.pk})')
     return redirect('article', article.pk)
 
 
@@ -130,6 +152,10 @@ def comment_rating(request, pk):
     try:
         if CommentRating.objects.get(user=request.user, comment=comment):
             CommentRating.objects.get(user=request.user, comment=comment).delete()
+
+            logger.info(f'User id({request.user.id}) removed the like from comment id({comment.pk})')
     except:
         CommentRating.objects.create(user=request.user, comment=comment)
+        
+        logger.info(f'User id({request.user.id}) liked comment id({comment.pk})')
     return redirect('article', comment.article.pk)
