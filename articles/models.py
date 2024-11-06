@@ -4,6 +4,7 @@ from django.urls import reverse
 
 
 class Articles(models.Model):
+    """Статья"""
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=250)
     text = models.TextField(blank=False)
@@ -16,6 +17,7 @@ class Articles(models.Model):
     class Meta:
         verbose_name = 'Статья'
         verbose_name_plural = 'Статьи'
+        ordering = ['date']
 
     def __str__(self):
         return self.title
@@ -25,6 +27,7 @@ class Articles(models.Model):
 
 
 class Comments(models.Model):
+    """Комментарии о статье"""
     article = models.ForeignKey('Articles', on_delete=models.CASCADE, blank=True, null=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     text = models.TextField(blank=False)
@@ -39,6 +42,7 @@ class Comments(models.Model):
 
 
 class Categories(models.Model):
+    """Категории статей"""
     title = models.CharField(max_length=250)
 
     class Meta:
@@ -53,6 +57,7 @@ class Categories(models.Model):
 
 
 class Tags(models.Model):
+    """Теги для статей"""
     title = models.CharField(max_length=250)
 
     class Meta:
@@ -64,6 +69,7 @@ class Tags(models.Model):
     
 
 class ArticleRating(models.Model):
+    """Список всех кому понравилась статья. Одна запись = один лайк"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Articles, on_delete=models.CASCADE)
 
@@ -76,6 +82,7 @@ class ArticleRating(models.Model):
     
 
 class CommentRating(models.Model):
+    """Список всех кому понравился комментарий. Одна запись = один лайк"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comments, on_delete=models.CASCADE)
 

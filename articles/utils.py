@@ -6,7 +6,9 @@ import logging
 
 logger = logging.getLogger('main')
 
+
 def get_comments(art_pk):
+    """Возвращает комментарии с их рейтингом (кол-вом лайков)"""
     comments = Comments.objects.filter(article__pk=art_pk)
     complete_comment = []
     for comment in comments:
@@ -18,6 +20,7 @@ def get_comments(art_pk):
 
 
 def get_form_for_create_comments(request, article, art_pk):
+    """Создание комментарий"""
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -25,7 +28,9 @@ def get_form_for_create_comments(request, article, art_pk):
             new_form.author = request.user
             new_form.article = article
             new_form.save()
+
             logger.info(f'User id({request.user.id}) posted a comment id({new_form.pk})')
+            
             return redirect('article', art_pk)
     else:
         form = CommentForm()
