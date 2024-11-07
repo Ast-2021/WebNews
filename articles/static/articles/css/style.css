@@ -39,14 +39,13 @@ a {
 }
 
 .list-group-item-image {
-
     margin: 15px;
 }
 
 .list-group-item-image>img {
+    object-fit: cover;
     height: 170px;
-    width: auto;
-
+    width: 170px;
 }
 
 .list-group-item>a {
