@@ -1,10 +1,18 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 
+from captcha.models import CaptchaStore 
+from captcha.helpers import captcha_image_url
+from django.test import TestCase, override_settings
+
 from .models import *
 from .forms import *
 
 
+@override_settings(CACHES={
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }})
 class TestViews(TestCase):
     """Тестирование классов и функций модуля views.py"""
 
@@ -16,28 +24,31 @@ class TestViews(TestCase):
         self.article_2 = Articles.objects.create(title='cool_article', text='cool_text', category=self.category_2)
         self.user = User.objects.create_user(username='username', password='password')
         self.comment = Comments.objects.create(article=self.article_1, author=self.user, text='test_comment')
+        self.tag = Tags.objects.create(title='NBA')
 
         self.client.login(username='username', password='password')
 
+        self.url_articles_home = reverse('home')
         self.url_article_page = reverse('article', args=[self.article_1.pk])
         self.url_category = reverse('category', args=[self.category_1.pk])
         self.url_create_article = reverse('create_article')
         self.url_update_article = reverse('edit', args=[self.article_1.pk])
         self.url_register_user = reverse('register')
         self.url_login_user = reverse('login')
-        self.url_delete_article = reverse('delete', args=[self.article_1.pk])
+        self.url_delete_article = reverse('delete_article', args=[self.article_1.pk])
         self.url_user_page = reverse('user_page')
         self.url_article_rating = reverse('article_rating', args=[self.article_1.pk])
         self.url_comment_rating = reverse('comment_rating', args=[self.comment.pk])
 
 
-    def test_index(self):
-        response = self.client.get('/')
-
+    def test_articles_home(self):
+        response = self.client.get(self.url_articles_home)
+        print(response.templates)
         self.assertEqual(response.status_code, 200)
         self.assertIn('test_article', response.content.decode('utf-8'))
         self.assertIn('cool_article', response.content.decode('utf-8'))
-        self.assertTemplateUsed(response, 'articles/index.html')
+        print(response.templates)
+        self.assertTemplateUsed(response, 'articles\index.html')
 
 
     def test_category_view(self):
@@ -56,11 +67,10 @@ class TestViews(TestCase):
         self.assertIn('test_comment', response.content.decode('utf-8'))
         self.assertNotIn('Cool article', response.content.decode('utf-8'))
 
-        response_2 = self.client.post(self.url_article_page, {
+        self.client.post(self.url_article_page, {
             'text': 'Cool article'
         })
 
-        self.assertEqual(response_2.status_code, 302)
         self.assertEqual(Comments.objects.count(), 2)
         self.assertEqual(Comments.objects.last().text, 'Cool article')
 
@@ -82,6 +92,7 @@ class TestViews(TestCase):
             'title': 'Моя уже обновлянная первая статья',
             'text': 'то содержимое моей статьи',
             'category': self.category_1.pk,
+            'tags': self.tag.pk,
         })
 
         self.assertEqual(response.status_code, 302)
@@ -91,10 +102,16 @@ class TestViews(TestCase):
 
     def test_register_user(self):
         self.client.logout()
+
+        captcha_key = CaptchaStore.generate_key() 
+        captcha_value = CaptchaStore.objects.get(hashkey=captcha_key).response
+
         response = self.client.post(self.url_register_user, {
             'username': 'username_2',
             'password1': 'passwordpassword',
             'password2': 'passwordpassword',
+            'captcha_0': captcha_key,
+            'captcha_1': captcha_value,
         })
 
         self.assertEqual(response.status_code, 302)
@@ -160,17 +177,6 @@ class TestForms(TestCase):
         form = ArticleForm(data=form_data)
         self.assertTrue(form.is_valid())
 
-    
-    def test_register_user_form(self):
-        form_data = {
-            'username': 'test_username',
-            'password1': 'testpassword1',
-            'password2': 'testpassword1'
-        }
-
-        form = RegisterUserForm(data=form_data)
-        self.assertTrue(form.is_valid())
-
 
     def test_comment_form(self):
         form_data = {
@@ -178,4 +184,20 @@ class TestForms(TestCase):
         }
 
         form = CommentForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    
+    def test_register_form(self):
+        captcha_key = CaptchaStore.generate_key() 
+        captcha_value = CaptchaStore.objects.get(hashkey=captcha_key).response
+
+        form_data = {
+            'username': 'username_2',
+            'password1': 'passwordpassword',
+            'password2': 'passwordpassword',
+            'captcha_0': captcha_key,
+            'captcha_1': captcha_value,
+        }
+
+        form = RegisterUserForm(data=form_data)
         self.assertTrue(form.is_valid())

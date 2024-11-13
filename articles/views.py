@@ -6,7 +6,6 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.decorators.cache import cache_page
 
 from .utils import *
 from .forms import *
@@ -21,7 +20,7 @@ logger = logging.getLogger('main')
 class ArticlesHome(ListView):
     """Главная страница"""
     model = Articles
-    template_name = 'articles/index.html'
+    template_name = 'articles\index.html'
     context_object_name = 'articles'
 
     def get_context_data(self, **kwargs):
@@ -45,7 +44,6 @@ class CategoryView(ListView):
         return Articles.objects.filter(category__pk=self.kwargs['cat_pk'])
 
 
-@cache_page(60)
 def article_page(request, art_pk):
     """Страница статьи"""
     article = Articles.objects.get(pk=art_pk)
@@ -140,7 +138,7 @@ def user_page(request):
     return render(request, 'articles/user_page.html', context=context)
 
 
-@login_required(redirect_field_name='login')
+@login_required(login_url='login')
 def article_rating(request, pk):
     """Поставить лайк статье, либо удалить его если он уже стоит"""
     article = Articles.objects.get(pk=pk)
@@ -157,7 +155,7 @@ def article_rating(request, pk):
     return redirect('article', article.pk)
 
 
-@login_required(redirect_field_name='login')
+@login_required(login_url='login')
 def comment_rating(request, pk):
     """Поставить лайк комментарию, либо удалить его если он уже стоит"""
     comment = Comments.objects.get(pk=pk)

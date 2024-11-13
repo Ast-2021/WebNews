@@ -1,4 +1,6 @@
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
 from .models import *
 from .forms import *
 
@@ -21,7 +23,8 @@ def get_comments(art_pk):
 
 def get_form_for_create_comments(request, article, art_pk):
     """Создание комментарий"""
-    if request.method == 'POST':
+    user_with_authorization = str(request.user) != 'AnonymousUser'
+    if request.method == 'POST' and user_with_authorization:
         form = CommentForm(request.POST)
         if form.is_valid():
             new_form = form.save()

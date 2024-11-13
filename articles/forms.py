@@ -16,7 +16,6 @@ class RegisterUserForm(UserCreationForm):
     password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
     captcha = CaptchaField()
 
-
     class Meta:
         model = User
         fields = ('username', 'password1', 'password2')
