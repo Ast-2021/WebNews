@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, CreateView
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
@@ -123,13 +123,10 @@ def logout_user(request):
     return redirect('login')
 
 
-def delete_article(request, art_pk):
-    """Удаление статьи"""
-    Articles.objects.get(pk=art_pk).delete()
-
-    logger.info(f'User id({request.user.id}) deleted article id({art_pk})')
-
-    return redirect('home')
+class DeleteArticle(DeleteView):
+    model = Articles
+    template_name = 'articles/delete_article.html'
+    success_url = reverse_lazy('home')
 
 
 def delete_comment(request, com_pk):

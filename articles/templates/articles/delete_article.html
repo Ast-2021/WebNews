@@ -1,0 +1,11 @@
+{% extends 'articles/base.html' %}
+
+
+{% block body %}
+<form method="post">
+    {% csrf_token %}
+    <h1 style="color: white; margin: 40px">Are you sure you want to delete?</h1>
+    <button type="submit">Yes, delete</button>
+    <a style="color: white; margin: 40px" href="{% url 'home' %}">Cancel</a>
+</form>
+{% endblock %}
