@@ -129,14 +129,15 @@ class DeleteArticle(DeleteView):
     success_url = reverse_lazy('home')
 
 
-def delete_comment(request, com_pk):
-    """Удаление комментария"""
-    article_pk = Comments.objects.get(pk=com_pk).article.pk
-    Comments.objects.get(pk=com_pk).delete()
+class DeleteComment(DeleteView):
+    model = Comments
+    template_name = 'articles/delete.html'
+    success_url = reverse_lazy('home')
 
-    logger.info(f'User id({request.user.id} deleted comment id({com_pk}))')
-
-    return redirect('article', article_pk)
+    def get_success_url(self):
+        article_id = str(self.object.article.id)
+        print(article_id)
+        return reverse('article', kwargs={'art_pk': article_id})
 
 
 def user_page(request):
