@@ -33,11 +33,6 @@ class ArticlesHome(ListView):
 class CategoryView(ArticlesHome):
     """Статьи с определенной категорией"""
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['categories'] = Categories.objects.all()
-        return context
-    
     def get_queryset(self):
         return Articles.objects.filter(category__pk=self.kwargs['cat_pk'])
 
