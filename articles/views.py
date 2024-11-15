@@ -9,7 +9,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import DetailView
 from django.db.models import Count, Exists, OuterRef
 
-from .utils import *
 from .forms import *
 from .models import *
 
@@ -31,11 +30,8 @@ class ArticlesHome(ListView):
         return context
 
 
-class CategoryView(ListView):
+class CategoryView(ArticlesHome):
     """Статьи с определенной категорией"""
-    model = Articles
-    template_name = 'articles/index.html'
-    context_object_name = 'articles'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
