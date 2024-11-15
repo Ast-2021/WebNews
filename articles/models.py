@@ -12,7 +12,6 @@ class Articles(models.Model):
     tags = models.ManyToManyField('Tags', blank=True)
     image = models.ImageField(upload_to='articles/%Y%m%d/', blank=True)
     date = models.DateField(auto_now_add=True)
-    rating = models.IntegerField(default=0, blank=True)
 
     class Meta:
         verbose_name = 'Статья'
@@ -70,7 +69,7 @@ class Tags(models.Model):
 class ArticleRating(models.Model):
     """Список всех кому понравилась статья. Одна запись = один лайк"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    article = models.ForeignKey(Articles, on_delete=models.CASCADE)
+    article = models.ForeignKey(Articles, on_delete=models.CASCADE, related_name='articleratings')
 
     class Meta:
         verbose_name = 'Оценка статьи'

@@ -17,10 +17,10 @@
                 <p>{{ article.text|linebreaks }}</p>
                 <p>{{ article.date }}</p>
                 <div class="box-with-article-rating-and-buttons-delete-update">
-                    {% if request.user in article_valuers %}
-                    <a class="article-rating" href="{% url 'article_rating' article.pk %}"><i class="fa-solid fa-heart"></i></a> {{ article_rating }}
+                    {% if user_rated %}
+                    <a class="article-rating" href="{% url 'article_rating' article.pk %}"><i class="fa-solid fa-heart"></i></a> {{ article.rating }}
                     {% else %}
-                    <a class="article-rating" href="{% url 'article_rating' article.pk %}"><i class="fa-regular fa-heart"></i></a> {{ article_rating }}
+                    <a class="article-rating" href="{% url 'article_rating' article.pk %}"><i class="fa-regular fa-heart"></i></a> {{ article.rating }}
                     {% endif %}
                     {% if request.user == article.author %}
                     <a class="article-button-delete" href="{% url 'delete_article' article.pk %}"><button type="button" class="btn btn-danger">Delete</button></a>
@@ -47,17 +47,17 @@
           <ul class="list-group">
               {% for comment in comments %}
                 <li class="list-group-item">
-                    <h3>{{ comment.body.author }}</h3>
-                    <p>{{ comment.body.date }}</p>
-                    <p>{{ comment.body.text }}</p>
+                    <h3>{{ comment.author }}</h3>
+                    <p>{{ comment.date }}</p>
+                    <p>{{ comment.text }}</p>
                     <div class="box-with-comment-rating-and-button-delete">
-                        {% if request.user in comment.users_valuers %}
-                        <a class="comment-rating" href="{% url 'comment_rating' comment.body.pk %}"><i class="fa-solid fa-heart"></i></a> {{ comment.rating }}
+                        {% if comment.user_rated %}
+                        <a class="comment-rating" href="{% url 'comment_rating' comment.pk %}"><i class="fa-solid fa-heart"></i></a> {{ comment.rating }}
                         {% else %}
-                        <a class="comment-rating" href="{% url 'comment_rating' comment.body.pk %}"><i class="fa-regular fa-heart"></i></a> {{ comment.rating }}
+                        <a class="comment-rating" href="{% url 'comment_rating' comment.pk %}"><i class="fa-regular fa-heart"></i></a> {{ comment.rating }}
                         {% endif %}
-                        {% if request.user == comment.body.author %}
-                        <a class="comment-button-delete" href="{% url 'delete_comment' comment.body.pk %}"><button type="button" class="btn btn-danger">Delete</button></a>
+                        {% if request.user == comment.author %}
+                        <a class="comment-button-delete" href="{% url 'delete_comment' comment.pk %}"><button type="button" class="btn btn-danger">Delete</button></a>
                         {% endif %}
                     </div>
                 </li>

@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import ListView, CreateView
@@ -6,6 +6,8 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.detail import DetailView
+from django.db.models import Count, Exists, OuterRef
 
 from .utils import *
 from .forms import *
@@ -20,7 +22,7 @@ logger = logging.getLogger('main')
 class ArticlesHome(ListView):
     """Главная страница"""
     model = Articles
-    template_name = 'articles\index.html'
+    template_name = 'articles/index.html'
     context_object_name = 'articles'
 
     def get_context_data(self, **kwargs):
@@ -44,21 +46,42 @@ class CategoryView(ListView):
         return Articles.objects.filter(category__pk=self.kwargs['cat_pk'])
 
 
-def article_page(request, art_pk):
-    """Страница статьи"""
-    article = Articles.objects.get(pk=art_pk)
-    article_rating = ArticleRating.objects.filter(article=article).count()
-    categories = Categories.objects.all()
+class ArticlePage(DetailView):
+    model = Articles
+    template_name = 'articles/article_page.html'
+    context_object_name = 'article'
 
-    article_valuers = [a.user for a in ArticleRating.objects.filter(article=article)]
+    def post(self, request, *args, **kwargs):
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            new_form = form.save()
+            new_form.author = request.user
+            new_form.article = self.get_object()
+            new_form.save()
+            logger.info(f'User id({request.user.id}) posted a comment id({new_form.pk})')
+            return redirect('article', self.get_object().pk)
+        
+    def get_queryset(self):
+        queryset = Articles.objects.annotate(rating=Count('articleratings'))
+        return queryset
 
-    form = get_form_for_create_comments(request, article, art_pk)
-    comments = get_comments(art_pk)
+    def get_object(self):
+        queryset = self.get_queryset()
+        article_id = self.kwargs.get('art_pk')
+        return get_object_or_404(queryset, pk=article_id)
 
-    context = {'categories': categories, 'article': article, 'form': form, 
-               'article_rating': article_rating, 'comments': comments, 
-               'article_valuers': article_valuers}
-    return render(request, 'articles/article_page.html', context=context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Categories.objects.all()
+        user_rated_subquery = CommentRating.objects.filter(
+            comment=OuterRef('pk'), user=self.request.user)
+        context['comments'] = Comments.objects.annotate(
+            rating=Count('commentrating'), user_rated=Exists(user_rated_subquery))
+        article = self.get_object()
+        article_raters = ArticleRating.objects.filter(article=article)
+        context['article_raters'] = article_raters 
+        context['user_rated'] = article_raters.filter(user=self.request.user).exists()
+        return context
 
 
 class CreateArticle(LoginRequiredMixin, CreateView):
