@@ -171,3 +171,5 @@ CACHES = {
         "LOCATION": os.path.join(BASE_DIR, 'webnews_cache'),
     }
 }
+
+LOGIN_REDIRECT_URL = 'home'

@@ -128,11 +128,11 @@ class TestViews(TestCase):
 
 
     def test_delete_article(self):
-        response = self.client.get(self.url_delete_article)
+        response = self.client.post(self.url_delete_article)
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Articles.objects.count(), 1)
-        self.assertNotEqual(Articles.objects.first().title, 'test_article')
+        self.assertRedirects(response, reverse('home'))
 
 
     def test_user_page(self):

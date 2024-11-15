@@ -118,36 +118,39 @@ class LoginUser(LoginView):
 
 
 def logout_user(request):
-    """Выход из аккаунта"""
     logout(request)
     return redirect('login')
 
 
-class DeleteArticle(DeleteView):
+class DeleteArticle(LoginRequiredMixin, DeleteView):
     model = Articles
     template_name = 'articles/delete_article.html'
     success_url = reverse_lazy('home')
 
 
-class DeleteComment(DeleteView):
+class DeleteComment(LoginRequiredMixin, DeleteView):
     model = Comments
     template_name = 'articles/delete.html'
     success_url = reverse_lazy('home')
 
     def get_success_url(self):
         article_id = str(self.object.article.id)
-        print(article_id)
         return reverse('article', kwargs={'art_pk': article_id})
 
 
-def user_page(request):
-    """Страница пользователя с его статьями, и комментариями"""
-    user = User.objects.get(username=request.user.username)
-    articles = Articles.objects.filter(author=user)
-    comments = Comments.objects.filter(author=user)
+class UserPage(LoginRequiredMixin, DetailView):
+    model = User
+    template_name = 'articles/user_page.html'
+    context_object_name = 'user'
+
+    def get_object(self):
+        return self.request.user
     
-    context = {'articles': articles, 'user': user, 'comments': comments}
-    return render(request, 'articles/user_page.html', context=context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['articles'] = Articles.objects.filter(author=self.request.user)
+        context['comments'] = Comments.objects.filter(author=self.request.user)
+        return context
 
 
 @login_required(login_url='login')
