@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, CreateView
@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import DetailView
 from django.db.models import Count, Exists, OuterRef
 
+from .utils import *
 from .forms import *
 from .models import *
 
@@ -64,15 +65,22 @@ class ArticlePage(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Categories.objects.all()
-        user_rated_subquery = CommentRating.objects.filter(
-            comment=OuterRef('pk'), user=self.request.user)
-        context['comments'] = Comments.objects.annotate(
-            rating=Count('commentrating'), user_rated=Exists(user_rated_subquery))
-        article = self.get_object()
-        article_raters = ArticleRating.objects.filter(article=article)
-        context['article_raters'] = article_raters 
-        context['user_rated'] = article_raters.filter(user=self.request.user).exists()
+        if self.request.user.is_authenticated:
+            user_rated_subquery = CommentRating.objects.filter(
+                comment=OuterRef('pk'), user=self.request.user)
+            context['comments'] = Comments.objects.annotate(
+                rating=Count('commentrating'), user_rated=Exists(user_rated_subquery))
+            article = self.get_object()
+            article_raters = ArticleRating.objects.filter(article=article)
+            context['article_raters'] = article_raters
+            context['user_rated'] = article_raters.filter(user=self.request.user).exists()
+        else:
+            context['comments'] = Comments.objects.annotate(
+                rating=Count('commentrating'))
+            context['article_raters'] = None
+            context['user_rated'] = False
         return context
+
 
 
 class CreateArticle(LoginRequiredMixin, CreateView):
@@ -155,33 +163,12 @@ class UserPage(LoginRequiredMixin, DetailView):
 
 @login_required(login_url='login')
 def article_rating(request, pk):
-    """Поставить лайк статье, либо удалить его если он уже стоит"""
-    article = Articles.objects.get(pk=pk)
-    try:
-        if ArticleRating.objects.get(user=request.user, article=article):
-            ArticleRating.objects.get(user=request.user, article=article).delete()
-
-            logger.info(f'User id({request.user.id}) removed the like from article id({article.pk})')
-    except:
-        ArticleRating.objects.create(user=request.user, article=article)
-
-        logger.info(f'User id({request.user.id}) liked article id({article.pk})')
-
-    return redirect('article', article.pk)
+    ArticleLike(request, pk)
+    return redirect('article', pk)
 
 
 @login_required(login_url='login')
 def comment_rating(request, pk):
-    """Поставить лайк комментарию, либо удалить его если он уже стоит"""
-    comment = Comments.objects.get(pk=pk)
-    try:
-        if CommentRating.objects.get(user=request.user, comment=comment):
-            CommentRating.objects.get(user=request.user, comment=comment).delete()
-
-            logger.info(f'User id({request.user.id}) removed the like from comment id({comment.pk})')
-    except:
-        CommentRating.objects.create(user=request.user, comment=comment)
-        
-        logger.info(f'User id({request.user.id}) liked comment id({comment.pk})')
-
-    return redirect('article', comment.article.pk)
+    comment_rat = CommentLike(request, pk)
+    return redirect('article', comment_rat.model_object.article.pk)
+    
