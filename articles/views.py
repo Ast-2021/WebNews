@@ -7,7 +7,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import DetailView
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Count
 
 from .utils import *
 from .forms import *
@@ -35,7 +35,7 @@ class CategoryView(ArticlesHome):
     """Статьи с определенной категорией"""
 
     def get_queryset(self):
-        return Articles.objects.filter(category__pk=self.kwargs['cat_pk'])
+        return Articles.objects.filter(category__pk=self.kwargs['pk'])
 
 
 class ArticlePage(DetailView):
@@ -59,28 +59,16 @@ class ArticlePage(DetailView):
 
     def get_object(self):
         queryset = self.get_queryset()
-        article_id = self.kwargs.get('art_pk')
+        article_id = self.kwargs.get('pk')
         return get_object_or_404(queryset, pk=article_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        article = self.get_object()
         context['categories'] = Categories.objects.all()
-        if self.request.user.is_authenticated:
-            user_rated_subquery = CommentRating.objects.filter(
-                comment=OuterRef('pk'), user=self.request.user)
-            context['comments'] = Comments.objects.annotate(
-                rating=Count('commentrating'), user_rated=Exists(user_rated_subquery))
-            article = self.get_object()
-            article_raters = ArticleRating.objects.filter(article=article)
-            context['article_raters'] = article_raters
-            context['user_rated'] = article_raters.filter(user=self.request.user).exists()
-        else:
-            context['comments'] = Comments.objects.annotate(
-                rating=Count('commentrating'))
-            context['article_raters'] = None
-            context['user_rated'] = False
+        context['comments'] = Comments.get_comment_queryset(article.id)
+        context['article'] = Articles.get_article(article)
         return context
-
 
 
 class CreateArticle(LoginRequiredMixin, CreateView):
@@ -143,7 +131,7 @@ class DeleteComment(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         article_id = str(self.object.article.id)
-        return reverse('article', kwargs={'art_pk': article_id})
+        return reverse('article', kwargs={'pk': article_id})
 
 
 class UserPage(LoginRequiredMixin, DetailView):

@@ -5,8 +5,8 @@ from django.views.decorators.cache import cache_page
 
 urlpatterns = [
     path('', cache_page(60)(views.ArticlesHome.as_view()), name='home'),
-    path('category/<int:cat_pk>', cache_page(60)(views.CategoryView.as_view()), name='category'),
-    path('article/<int:art_pk>', views.ArticlePage.as_view(), name='article'),
+    path('category/<int:pk>', cache_page(60)(views.CategoryView.as_view()), name='category'),
+    path('article/<int:pk>', views.ArticlePage.as_view(), name='article'),
     path('create_article/', views.CreateArticle.as_view(), name='create_article'),
     path('register', views.RegisterUser.as_view(), name='register'),
     path('login',  views.LoginUser.as_view(), name='login'),

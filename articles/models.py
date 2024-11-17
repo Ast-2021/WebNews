@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.db.models import Count
 
 
 class Articles(models.Model):
@@ -21,7 +22,26 @@ class Articles(models.Model):
         return self.title
     
     def get_absolute_url(self):
-        return reverse('article', kwargs={'art_pk': self.pk})
+        return reverse('article', kwargs={'pk': self.pk})
+    
+    @classmethod
+    def get_article(cls, article):
+        ratings = ArticleRating.objects.filter(article=article)
+        count_ratings = ratings.count()
+        all_users = ratings.values_list('user_id', flat=True)
+
+        article_data = {
+            'id': article.id,
+            'author': article.author,
+            'title': article.title,
+            'text': article.text,
+            'category': article.category,
+            'image': article.image,
+            'date': article.date,
+            'count_rating': count_ratings,
+            'all_users': all_users,
+        }
+        return article_data
 
 
 class Comments(models.Model):
@@ -37,6 +57,29 @@ class Comments(models.Model):
 
     def __str__(self):
         return self.text
+    
+    @classmethod
+    def get_comment_queryset(cls, article_id):
+        query = f"""
+        SELECT 
+            com.id, 
+            com.author_id, 
+            com.text, 
+            com.date, 
+            COUNT(rating) as count_rating, 
+            array_agg(rating.user_id) as all_users
+        FROM 
+            articles_comments com
+        LEFT JOIN 
+            articles_commentrating rating ON com.id = rating.comment_id
+        WHERE 
+            com.article_id = %s
+        GROUP BY 
+            com.id
+        """
+
+        result = cls.objects.raw(query, [article_id])
+        return result
 
 
 class Categories(models.Model):
@@ -51,7 +94,7 @@ class Categories(models.Model):
         return self.title
     
     def get_absolute_url(self):
-        return reverse('category', kwargs={'cat_pk': self.pk})
+        return reverse('category', kwargs={'pk': self.pk})
 
 
 class Tags(models.Model):
