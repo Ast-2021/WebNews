@@ -1,0 +1,38 @@
+# Python-specific ignores 
+__pycache__/ 
+*.py[cod] 
+*.egg 
+*.egg-info/ 
+dist/ 
+build/ 
+eggs/ 
+parts/ 
+bin/ 
+var/ 
+*.log 
+*.pot 
+*.pyc 
+*.pyo 
+*.pyd 
+*.so 
+# Django-specific ignores 
+*.sqlite3 
+db.sqlite3 
+media/ 
+staticfiles/ 
+local_settings.py
+.djcache
+# VS Code-specific ignores 
+.vscode/ 
+# Virtual Environment 
+venv/ 
+.env/ 
+*.env 
+# OS-specific ignores 
+.DS_Store 
+Thumbs.db 
+# IDE-specific ignores 
+.idea/ 
+*.iml
+
+*.log

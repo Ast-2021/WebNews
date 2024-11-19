@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -8,15 +9,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import DetailView
 from django.db.models import Count
+from .utils.decorators import *
 
-from .utils import *
+from .utils.utils import *
 from .forms import *
 from .models import *
-
-import logging
-
-
-logger = logging.getLogger('main')
 
 
 class ArticlesHome(ListView):
@@ -43,6 +40,7 @@ class ArticlePage(DetailView):
     template_name = 'articles/article_page.html'
     context_object_name = 'article'
 
+    @log_user_action_cls(text_for_logging='wrote a comment')
     def post(self, request, *args, **kwargs):
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -50,7 +48,6 @@ class ArticlePage(DetailView):
             new_form.author = request.user
             new_form.article = self.get_object()
             new_form.save()
-            logger.info(f'User id({request.user.id}) posted a comment id({new_form.pk})')
             return redirect('article', self.get_object().pk)
         
     def get_queryset(self):
@@ -77,7 +74,6 @@ class CreateArticle(LoginRequiredMixin, CreateView):
     
     form_class = ArticleForm
     template_name = 'articles/create_article.html'
-    success_url = reverse_lazy('home')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -87,32 +83,41 @@ class CreateArticle(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
-
+    
+    @log_user_action_cls(text_for_logging='created an article')
+    def get_success_url(self):
+        return reverse('home')
+    
 
 class ArticleUpdateView(UpdateView):
     """Редактирование статьи"""
     model = Articles
     fields = ['title', 'text', 'image', 'category', 'tags']
     template_name = 'articles/create_article.html'
-    success_url = reverse_lazy('home')
+
+    @log_user_action_cls(text_for_logging='updated the article')
+    def get_success_url(self):
+        return reverse('home')
 
 
 class RegisterUser(CreateView):
     """Регистарция пользователя"""
     form_class = RegisterUserForm
     template_name = 'articles/register.html'
-    
-    def get_success_url(self):
-        return reverse_lazy('home')
-
+    success_url = 'login'
+   
 
 class LoginUser(LoginView):
     """Авторизация пользователя"""
     form_class = LoginUserForm
     template_name = 'articles/login.html'
-    success_url = reverse_lazy('home')
+
+    @log_user_action_cls(text_for_logging='logged in')
+    def get_success_url(self):
+        return reverse('home')
 
 
+@log_user_action(text_for_logging='logged out of account')
 def logout_user(request):
     logout(request)
     return redirect('login')
@@ -120,15 +125,20 @@ def logout_user(request):
 
 class DeleteArticle(LoginRequiredMixin, DeleteView):
     model = Articles
-    template_name = 'articles/delete_article.html'
+    template_name = 'articles/delete.html'
     success_url = reverse_lazy('home')
+
+    @log_user_action_cls(text_for_logging='deleted article')
+    def get_success_url(self):
+        return reverse('home')
 
 
 class DeleteComment(LoginRequiredMixin, DeleteView):
     model = Comments
     template_name = 'articles/delete.html'
     success_url = reverse_lazy('home')
-
+    
+    @log_user_action_cls(text_for_logging='deleted comment')
     def get_success_url(self):
         article_id = str(self.object.article.id)
         return reverse('article', kwargs={'pk': article_id})
@@ -150,12 +160,14 @@ class UserPage(LoginRequiredMixin, DetailView):
 
 
 @login_required(login_url='login')
+@log_user_action(text_for_logging='+/- like to article')
 def article_rating(request, pk):
     ArticleLike(request, pk)
     return redirect('article', pk)
 
 
 @login_required(login_url='login')
+@log_user_action(text_for_logging='+/- like to comment')
 def comment_rating(request, pk):
     comment_rat = CommentLike(request, pk)
     return redirect('article', comment_rat.model_object.article.pk)
