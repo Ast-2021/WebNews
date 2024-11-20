@@ -10,8 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import logging.handlers
 import os
+from datetime import datetime
 from pathlib import Path
+
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -72,6 +76,10 @@ TEMPLATES = [
     },
 ]
 
+LOG_DIR = os.path.join(BASE_DIR, 'logging') 
+if not os.path.exists(LOG_DIR): 
+    os.makedirs(LOG_DIR)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -83,9 +91,13 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
             'formatter': 'main_format',
-            'filename': os.path.join(BASE_DIR, 'information.log')
+            'filename': os.path.join(LOG_DIR, f'log_{datetime.now().strftime("%Y-%m-%d")}.log'),
+            'when': 'midnight',
+            'interval': 1,
+            'backupCount': 5,
+            'encoding': 'utf-8',
         }
     },
     'loggers': {
