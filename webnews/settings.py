@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-_7ve75))qi%*isio_dg$q*s)wk*o+o4her!eo8*$+@hhe9w08p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['stastr.pythonanywhere.com']
 
 
 # Application definition
@@ -117,12 +117,11 @@ WSGI_APPLICATION = 'webnews.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'webnews_db',
-        'USER': 'django_user',
-        'PASSWORD': 'password',
-        'HOST': '127.0.0.1',
-        'POST': '5432',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'stastr$django_project',
+        'USER': 'stastr',
+        'PASSWORD': 'Nfs25032000',
+        'HOST': 'stastr.mysql.pythonanywhere-services.com',
     }
 }
 

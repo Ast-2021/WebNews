@@ -43,12 +43,14 @@ class ArticlePage(DetailView):
     @log_user_action_cls(text_for_logging='wrote a comment')
     def post(self, request, *args, **kwargs):
         form = CommentForm(request.POST)
-        if form.is_valid():
+        if form.is_valid() and request.is_authenticated:
             new_form = form.save()
             new_form.author = request.user
             new_form.article = self.get_object()
             new_form.save()
             return redirect('article', self.get_object().pk)
+        else:
+            return redirect('login')
         
     def get_queryset(self):
         queryset = Articles.objects.annotate(rating=Count('articleratings'))
@@ -63,7 +65,7 @@ class ArticlePage(DetailView):
         context = super().get_context_data(**kwargs)
         article = self.get_object()
         context['categories'] = Categories.objects.all()
-        context['comments'] = Comments.get_comment_queryset(article.id)
+        context['comments'] = Comments.get_comment(article)
         context['article'] = Articles.get_article(article)
         return context
 

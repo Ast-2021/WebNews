@@ -59,27 +59,25 @@ class Comments(models.Model):
         return self.text
     
     @classmethod
-    def get_comment_queryset(cls, article_id):
-        query = f"""
-        SELECT 
-            com.id, 
-            com.author_id, 
-            com.text, 
-            com.date, 
-            COUNT(rating) as count_rating, 
-            array_agg(rating.user_id) as all_users
-        FROM 
-            articles_comments com
-        LEFT JOIN 
-            articles_commentrating rating ON com.id = rating.comment_id
-        WHERE 
-            com.article_id = %s
-        GROUP BY 
-            com.id
-        """
-
-        result = cls.objects.raw(query, [article_id])
-        return result
+    def get_comment(cls, article):
+        comments = Comments.objects.filter(article=article)
+        if not comments:
+            return []
+        comm = []
+        for comment in comments:
+            rating = CommentRating.objects.filter(comment=comment)
+            count_rating = rating.count()
+            all_users = rating.values_list('user_id', flat=True)
+            comment_data = {
+                    'id': comment.id,
+                    'author': comment.author,
+                    'text': comment.text,
+                    'date': comment.date,
+                    'count_rating': count_rating,
+                    'all_users': all_users
+                    }
+            comm.append(comment_data)
+        return comm
 
 
 class Categories(models.Model):
